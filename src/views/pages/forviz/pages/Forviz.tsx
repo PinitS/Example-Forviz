@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled, { css } from "styled-components";
-import { ApiRequest } from "../../../../applications/helpers/http/ApiRequest";
+import React, { useState } from "react";
+import styled from "styled-components";
 import Example1 from "../components/Example1";
 import Example2 from "../components/Example2";
 
@@ -12,13 +11,18 @@ const Container = styled.div`
 
 export default function Forviz() {
   const [image, setImage] = useState<any>([]);
-
+  const [example, setExample] = useState<number>(2);
   return (
     <div>
       {/* <Container> */}
       <p>Forviz</p>
-      {/* <Example1/> */}
-      <Example2/>
+      <p>https://paper.dropbox.com/doc/Dev-Fbr4cV8CCOA4itFkgIU2c</p>
+      <div>
+        <button onClick={() => setExample(1)}>Example 1</button>
+        <button onClick={() => setExample(2)}>Example 2.1</button>
+      </div>
+      {example === 1 && <Example1 />}
+      {example === 2 && <Example2 />}
       {/* </Container> */}
     </div>
   );
