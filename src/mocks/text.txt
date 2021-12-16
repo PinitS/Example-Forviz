@@ -1,0 +1,85 @@
+[
+    {
+        "id": 1,
+        "roomId": "A101",
+        "startTime": "2019-09-28 13:00:00",
+        "endTime": "2019-09-28 14:00:00",
+        "title": "Lunch with Petr"
+    },
+    {
+        "id": 2,
+        "roomId": "A101",
+        "startTime": "2019-09-28 14:00:00",
+        "endTime": "2019-09-28 15:00:00",
+        "title": "Sales Weekly Meeting"
+    },
+    {
+        "id": 3,
+        "roomId": "A101",
+        "startTime": "2019-09-28 16:00:00",
+        "endTime": "2019-09-28 18:00:00",
+        "title": "Anastasia Website Warroom"
+    },
+    {
+        "id": 4,
+        "roomId": "A101",
+        "startTime": "2019-09-29 13:00:00",
+        "endTime": "2019-09-29 14:00:00",
+        "title": "One-on-One Session"
+    },
+    {
+        "id": 5,
+        "roomId": "A101",
+        "startTime": "2019-09-29 16:00:00",
+        "endTime": "2019-09-29 18:00:00",
+        "title": "UGC Sprint Planning"
+    },
+    {
+        "id": 8,
+        "roomId": "A101",
+        "startTime": "2019-09-28 10:00:00",
+        "endTime": "2019-09-28 13:00:00",
+        "title": "Raimonland project"
+    },
+    {
+        "id": 10,
+        "roomId": "A101",
+        "startTime": "2019-10-04 14:00:00",
+        "endTime": "2019-10-06 11:00:00",
+        "title": "3-day workshop Corgi costume"
+    }
+]
+
+
+
+
+
+////
+ // const addOneMinutes = moment(bookingInput.startTime).add(1, "minutes").format();
+        // const subtractOneMinutes = moment(bookingInput.endTime).subtract(1, 'minutes').format();
+        // const checkStartTimeInputBetween =  moment(bookingInput.startTime).isBetween(item.startTime, item.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        // const checkEndTimeInputBetween =  moment(bookingInput.endTime).isBetween(item.startTime, item.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        // const checkStartTimeBookingBetween =  moment(item.startTime).isBetween(bookingInput.startTime, bookingInput.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        // const checkEndTimeBookingBetween =  moment(item.endTime).isBetween(bookingInput.startTime, bookingInput.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        // const checkLogic = (
+        //   checkStartTimeInputBetween === false &&
+        //   checkEndTimeInputBetween === false &&
+        //   checkStartTimeBookingBetween=== false &&
+        //   checkEndTimeBookingBetween === false
+        // ); // true คือ จองได้ false คือ จองไม่ได้
+
+        const bookingDataStart = item.startTime;
+        const bookingDataEnd =   item.endTime;
+  
+        const checkStartTimeInputBetween =  moment(testInputS).isBetween(bookingDataStart, bookingDataEnd); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        const checkEndTimeInputBetween =  moment(testInputE).isBetween(bookingDataStart, bookingDataEnd); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        const checkStartTimeBookingBetween =  moment(bookingDataStart).isBetween(testInputS, testInputE); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        const checkEndTimeBookingBetween =  moment(bookingDataEnd).isBetween(testInputS, testInputE); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+        const checkLogic = (
+          checkStartTimeInputBetween === false &&
+          checkEndTimeInputBetween === false &&
+          checkStartTimeBookingBetween=== false &&
+          checkEndTimeBookingBetween === false
+        );
+        console.log('checkLogic :>> ', checkLogic);
+                return (item.roomId === bookingInput.roomId && checkLogic === true) ? true : false;
