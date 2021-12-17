@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { H1 } from "../../../../styles/H1";
 import demoBookingData from "../../../../mocks/demoBookingData.json";
 import moment from "moment";
@@ -46,14 +46,20 @@ export default function Example2() {
           return item.roomId === bookingInput.roomId;
         })
         .map((item) => {
-          const addOneMinutes = moment(bookingInput.startTime).add(1, "minutes").format();
-          const subtractOneMinutes = moment(bookingInput.endTime).subtract(1, 'minutes').format();
-          const checkStartTimeInputBetween = moment(
-            addOneMinutes
-          ).isBetween(item.startTime, item.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
-          const checkEndTimeInputBetween = moment(
-            subtractOneMinutes
-          ).isBetween(item.startTime, item.endTime); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+          const addOneMinutes = moment(bookingInput.startTime)
+            .add(1, "minutes")
+            .format();
+          const subtractOneMinutes = moment(bookingInput.endTime)
+            .subtract(1, "minutes")
+            .format();
+          const checkStartTimeInputBetween = moment(addOneMinutes).isBetween(
+            item.startTime,
+            item.endTime
+          ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
+          const checkEndTimeInputBetween = moment(subtractOneMinutes).isBetween(
+            item.startTime,
+            item.endTime
+          ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
           const checkStartTimeBookingBetween = moment(item.startTime).isBetween(
             addOneMinutes,
             subtractOneMinutes

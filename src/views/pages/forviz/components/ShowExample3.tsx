@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
+import moment from "moment";
+import demoBookingData from "../../../../mocks/demoBookingData.json";
 
 const Container = styled.div`
   position: relative;
@@ -160,23 +162,71 @@ const Circle = styled.div<{ color?: string }>`
   top: 102px;
   z-index: 100;
 `;
-export default function ShowExample3() {
+const MenuLine = styled.div<{ left?: string; size?: string }>`
+  position: absolute;
+  border: 2px solid #707fdd;
+  top: 50px;
+  left: ${(props) => props.left};
+  width: ${(props) => props.size};
+`;
+const GroupMenuBtn = styled.div`
+  position: relative;
+`;
+export default function ShowExample3(props: any) {
+  const { roomId, filter } = props;
+  const [roomData, setRoomData] = useState<any>();
+  const [filterDate, setFilterDate] = useState(filter);
+  console.log("roomId :>> ", roomId);
+
+  const date = moment();
+  const dayOfWeek = date.format("dddd");
+  const dayMonth = date.format("DD MMM");
+  // const testAddWeek = date.add(1, "week");
+  const getweekOfYear = date.weeks();
+  const getYear = date.year();
+  // console.log("getweekOfYear :>> ", getweekOfYear);
+  // console.log("getYear :>> ", getYear);
+
+  useEffect(() => {
+    setFilterDate(filter);
+    const dataSet = demoBookingData.filter((item) => {
+      // return (
+      //   item.roomId === roomId &&
+      //   moment(item.startTime).weeks() === 39 &&
+      //   moment(item.startTime).year() === 2019
+      // );
+      return item.roomId === roomId;
+    });
+    setRoomData(dataSet);
+    console.log("roomData :>> ", roomData);
+  }, [roomId, filter]);
+
+  const initialDateData = {
+    dayOfWeek,
+    dayMonth,
+  };
+
+  const [dateData, setDateData] = useState(initialDateData);
+  const changeFilterFn = (value: string) => {
+    setFilterDate(value);
+  };
+
   return (
     <Container>
       <style>{"body { background-color: #B9BDC8; }"}</style>
       <LayoutContentLeft>
         <LayoutHeaderContentLeft>
-          <ContentHeaderLeft>A101</ContentHeaderLeft>
+          <ContentHeaderLeft>{roomId}</ContentHeaderLeft>
         </LayoutHeaderContentLeft>
         <MainContent>
           <TextContents size={"20px"} top={"8rem"}>
             Upcoming
           </TextContents>
           <TextContents weight={100} optical={true} size={"64px"} top={"12rem"}>
-            Monday
+            {dateData.dayOfWeek}
           </TextContents>
           <TextContents weight={100} size={"64px"} top={"17rem"}>
-            28 Sep
+            {dateData.dayMonth}
           </TextContents>
           <GroupTextContentsLeft>
             <TextContentsLeft>
@@ -198,9 +248,30 @@ export default function ShowExample3() {
       <LayoutContentRight>
         <LayoutHeaderContentRight>
           <GroupMenu>
-            <MenuHeader>THIS WEEK</MenuHeader>
-            <MenuHeader>NEXT WEEK</MenuHeader>
-            <MenuHeader>WHOLE MONTH</MenuHeader>
+            <GroupMenuBtn>
+              <MenuHeader onClick={() => changeFilterFn("TODAY")}>
+                TODAY
+              </MenuHeader>
+              {filterDate === "TODAY" && (
+                <MenuLine left={"10px"} size={"45px"} />
+              )}
+            </GroupMenuBtn>
+            <GroupMenuBtn>
+              <MenuHeader onClick={() => changeFilterFn("THIS WEEK")}>
+                THIS WEEK
+              </MenuHeader>
+              {filterDate === "THIS WEEK" && (
+                <MenuLine left={"10px"} size={"95px"} />
+              )}
+            </GroupMenuBtn>
+            <GroupMenuBtn>
+              <MenuHeader onClick={() => changeFilterFn("NEXT WEEK")}>
+                NEXT WEEK
+              </MenuHeader>
+              {filterDate === "NEXT WEEK" && (
+                <MenuLine left={"10px"} size={"105px"} />
+              )}
+            </GroupMenuBtn>
           </GroupMenu>
         </LayoutHeaderContentRight>
         <SectionContentScroll>

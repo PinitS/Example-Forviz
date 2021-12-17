@@ -26,7 +26,7 @@ export default function Forviz() {
       </div>
       {example === 1 && <Example1 />}
       {example === 2 && <Example2 />}
-      {example === 3 && <ShowExample3 />}
+      {example === 3 && <Example3 />}
       {/* </Container> */}
     </div>
   );
