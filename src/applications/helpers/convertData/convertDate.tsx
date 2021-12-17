@@ -7,3 +7,7 @@ export const convertDateToTime = (date: string) => {
 export const convertDateToTimeStartAndEnd = (start: string, end: string) => {
   return `${moment(start).format("HH:mm")} - ${moment(end).format("HH:mm")}`;
 };
+
+export const convertDateFormatForContent = (start: string) => {
+  return moment(start).format("ddd, DD MMM");
+};

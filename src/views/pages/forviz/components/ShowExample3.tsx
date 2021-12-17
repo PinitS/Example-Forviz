@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
 import moment from "moment";
 import demoBookingData from "../../../../mocks/demoBookingData.json";
-import { convertDateToTimeStartAndEnd } from "../../../../applications/helpers/convertData/convertDate";
+import {
+  convertDateToTimeStartAndEnd,
+  convertDateFormatForContent,
+} from "../../../../applications/helpers/convertData/convertDate";
 
 import { useSelector, useDispatch } from "react-redux";
-import {
-  CHANGE_DATE_FILTER_HAS_PAYLOAD_REQ,
-  CHANGE_ROOMID_FILTER_HAS_PAYLOAD_REQ,
-} from "../../../../applications/helpers/redux/types/filterDateTime/filterDateTime";
+import { CHANGE_DATE_FILTER_HAS_PAYLOAD_REQ } from "../../../../applications/helpers/redux/types/filterDateTime/filterDateTime";
 
 const Container = styled.div`
   position: relative;
@@ -173,6 +173,7 @@ const Circle = styled.div<{ color?: string }>`
 const MenuLine = styled.div<{ left?: string; size?: string }>`
   position: absolute;
   border: 2px solid #707fdd;
+  background: #707fdd;
   top: 50px;
   left: ${(props) => props.left};
   width: ${(props) => props.size};
@@ -180,47 +181,57 @@ const MenuLine = styled.div<{ left?: string; size?: string }>`
 const GroupMenuBtn = styled.div`
   position: relative;
 `;
+const TextContentNoData = styled.div`
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  font-family: "Roboto", sans-serif;
+  font-size: 20px;
+  color: #000;
+  font-weight: 300;
+`;
 export default function ShowExample3(props: any) {
   const storeFilter = useSelector(({ StoreFilter }: any) => StoreFilter);
   const dispatch = useDispatch();
   const roomId = storeFilter.roomId;
   const filter = storeFilter.filter;
-  const [roomData, setRoomData] = useState<any>();
+  const [roomData, setRoomData] = useState<any>([]);
   // const filterDate = filter;
   const [todayData, setTodayData] = useState<any>();
-  const date = moment();
+  // const date = moment();
+  const date = moment("2019-09-28 13:00:00");
   const dayOfWeek = date.format("dddd");
   const dayMonth = date.format("DD MMM");
-  const getNextweekOfYear = date.add(1, "weeks").weeks();
   const getweekOfYear = date.weeks();
   const getYear = date.year();
   const getDayOfYear = date.dayOfYear();
+  const getNextWeek = date.add(1, "weeks").weeks();
 
+  // console.log('------- :>> ', moment('2019-09-28').format('ddd, DD MMM'));
+  // const ss = "2019-09-19";
+  // console.log("moment(2019-09-30).weeks() :>> ", moment(ss).weeks());
+  // console.log("getweekOfYear :>> ", getweekOfYear);
+  // console.log("getNextWeek :>> ", getNextWeek);
   useEffect(() => {
-    // setFilterDate(filter);
-    console.log("refesh :>> ");
     const dataSet = demoBookingData
       .filter((item) => {
         if (filter === "today") {
-          console.log("if today :>> ", "today");
           return (
             item.roomId === roomId &&
-            moment(item.startTime).dayOfYear() === 271 && // <=== getDayOfYear // 271
-            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+            moment(item.startTime).dayOfYear() === getDayOfYear && // <=== getDayOfYear // 271
+            moment(item.startTime).year() === getYear // <=== getYear // 2019
           );
         } else if (filter === "thisweek") {
-          console.log("else if :>> ", "thisweek");
           return (
             item.roomId === roomId &&
-            moment(item.startTime).weeks() === 39 && // <=== getweekOfYear // 39 || 40
-            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+            Number(moment(item.startTime).weeks()) === Number(getweekOfYear) && // <=== getweekOfYear // 39 || 40
+            Number(moment(item.startTime).year()) === Number(getYear) // <=== getYear // 2019
           );
         } else {
-          console.log("else :>> ", "nextweek");
           return (
             item.roomId === roomId &&
-            moment(item.startTime).weeks() === 40 && // <=== getweekOfYear // 39 || 40
-            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+            moment(item.startTime).weeks() === getNextWeek &&
+            moment(item.startTime).year() === getYear
           );
         }
       })
@@ -243,9 +254,8 @@ export default function ShowExample3(props: any) {
         data: dataSet[item],
       };
     });
-    console.log("finalData :>> ", finalData);
     const findDayOfYear = finalData.find((item: any) => {
-      return moment(item.date).dayOfYear() === 271; // <== getDayOfYear // 271
+      return moment(item.date).dayOfYear() === getDayOfYear; // <== getDayOfYear // 271
     });
     setTodayData(findDayOfYear);
     setRoomData(finalData);
@@ -263,7 +273,7 @@ export default function ShowExample3(props: any) {
 
   return (
     <Container>
-      <style>{"body { background-color: #B9BDC8; }"}</style>
+      {/* <style>{"body { background-color: #B9BDC8; }"}</style> */}
       <LayoutContentLeft>
         <LayoutHeaderContentLeft>
           <ContentHeaderLeft>{roomId}</ContentHeaderLeft>
@@ -329,13 +339,18 @@ export default function ShowExample3(props: any) {
           </GroupMenu>
         </LayoutHeaderContentRight>
         <SectionContentScroll>
+          {roomData.length === 0 && (
+            <TextContentNoData>Data not found</TextContentNoData>
+          )}
           {roomData &&
             roomData.length > 0 &&
             roomData.map((item: any, index: number) => {
               return (
                 <div key={index} className={index > 0 ? "mt-15" : ""}>
                   <div>
-                    <TabInSectionContent>{item.date}</TabInSectionContent>
+                    <TabInSectionContent>
+                      {convertDateFormatForContent(item.date)}
+                    </TabInSectionContent>
                     <LineVertical />
                   </div>
 

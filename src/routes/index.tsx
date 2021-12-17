@@ -26,7 +26,7 @@ export default function index() {
 
         {/* //react-router-dom v6 un-protected*/}
         <Route path="/" element={<Forviz/>} />
-        <Route path="/bookings/:filter?roomId=:roomId" element={<Example4/>} />
+        <Route path="/bookings/:filter/:roomId" element={<Example4/>} />
         {/* <Route path="/redux" element={<ReduxTest/>} />
         <Route path="/test1" element={<Test1/>} />
         <Route path="/test2" element={<Test2/>} /> */}

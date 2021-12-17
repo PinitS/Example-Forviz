@@ -1,15 +1,34 @@
 import React, { useState } from "react";
 import { H1 } from "../../../../styles/H1";
+import { InputDate } from "../../../../styles/InputDate";
+import { Selection } from "../../../../styles/Selection";
+import { Text } from "../../../../styles/Text";
+import { GroupSection } from "../../../../styles/GroupSection";
 import demoBookingData from "../../../../mocks/demoBookingData.json";
 import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import styled from "styled-components";
 
 interface BookingDataInterface {
   roomId: string;
   startTime: string;
   endTime: string;
 }
+
+const Button = styled.div<{ color?: string }>`
+  color: #fff;
+  font-size: 20px;
+  margin: 0.5em;
+  padding: 0.25em 1em;
+  border-width: 2px;
+  border-style: solid;
+  background-color: #e74c3c;
+  border-color: #ff0000;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "Lato", sans-serif;
+`;
 
 export default function Example2() {
   const [bookingData, setBookingData] = useState(demoBookingData);
@@ -32,8 +51,8 @@ export default function Example2() {
   const changeRoomId = (roomId: string) => {
     setBookingInput({ ...bookingInput, roomId });
   };
-  const testInputS = "2019-09-28 12:10:00";
-  const testInputE = "2019-09-28 15:20:00";
+  // const testInputS = "2019-09-28 12:10:00";
+  // const testInputE = "2019-09-28 15:20:00";
   const checkAvailability = () => {
     const checkTimeInput = moment(bookingInput.endTime).diff(
       moment(bookingInput.startTime)
@@ -68,25 +87,6 @@ export default function Example2() {
             addOneMinutes,
             subtractOneMinutes
           ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
-
-          // const bookingDataStart = item.startTime;
-          // const bookingDataEnd = item.endTime;
-
-          // const checkStartTimeInputBetween = moment(testInputS).isBetween(
-          //   bookingDataStart,
-          //   bookingDataEnd
-          // ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
-          // const checkEndTimeInputBetween = moment(testInputE).isBetween(
-          //   bookingDataStart,
-          //   bookingDataEnd
-          // ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
-          // const checkStartTimeBookingBetween = moment(
-          //   bookingDataStart
-          // ).isBetween(testInputS, testInputE); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
-          // const checkEndTimeBookingBetween = moment(bookingDataEnd).isBetween(
-          //   testInputS,
-          //   testInputE
-          // ); // true คือ อยู่ระหว่าง ใน booking false คือ ไม่ได้อยู่
           const checkLogic =
             checkStartTimeInputBetween === false &&
             checkEndTimeInputBetween === false &&
@@ -109,37 +109,35 @@ export default function Example2() {
     <div>
       <H1>Example 2.1</H1>
       <ToastContainer />
-      <div style={{ display: "flex" }}>
+      <GroupSection>
         <div>
-          <p>roomId</p>
-          <select onChange={(e: any) => changeRoomId(e.target.value)}>
+          <Text>Room ID</Text>
+          <Selection onChange={(e: any) => changeRoomId(e.target.value)}>
             <option value="A101">A101</option>
             <option value="A102">A102</option>
             <option value="Auditorium">Auditorium</option>
-          </select>
+          </Selection>
         </div>
         <div>
-          <p>startDate</p>
-          <input
+          <Text>Start Date</Text>
+          <InputDate
             type="datetime-local"
             onChange={(e: any) => changeStartDate(e.target.value)}
             defaultValue={initialBookingInput.startTime}
           />
         </div>
         <div>
-          <p>endDate</p>
-          <input
+          <Text>End Date</Text>
+          <InputDate
             type="datetime-local"
             onChange={(e: any) => changeEndDate(e.target.value)}
             defaultValue={initialBookingInput.endTime}
           />
         </div>
-
-        <div>
-          <p>confirm</p>
-          <button onClick={() => checkAvailability()}>Check</button>
+        <div style={{ marginTop: "0.5rem" }}>
+          <Button onClick={() => checkAvailability()}>Check</Button>
         </div>
-      </div>
+      </GroupSection>
     </div>
   );
 }

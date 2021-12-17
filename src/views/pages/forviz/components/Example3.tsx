@@ -7,6 +7,9 @@ import {
   CHANGE_DATE_FILTER_HAS_PAYLOAD_REQ,
   CHANGE_ROOMID_FILTER_HAS_PAYLOAD_REQ,
 } from "../../../../applications/helpers/redux/types/filterDateTime/filterDateTime";
+import { Selection } from "../../../../styles/Selection";
+import { Text } from "../../../../styles/Text";
+import { GroupSection } from "../../../../styles/GroupSection";
 
 export default function Example3() {
   const storeFilter = useSelector(({ StoreFilter }: any) => StoreFilter);
@@ -22,26 +25,28 @@ export default function Example3() {
 
   return (
     <div>
-      <H1>Example 2.2</H1>
-      {JSON.stringify(storeFilter)}
-      <p>roomId</p>
-      <select
-        onChange={(e: any) => changeRoomId(e.target.value)}
-        defaultValue={storeFilter.roomId}
-      >
-        <option value="A101">A101</option>
-        <option value="A102">A102</option>
-        <option value="Auditorium">Auditorium</option>
-      </select>
-      <select
-        onChange={(e: any) => changeRoomFilter(e.target.value)}
-        defaultValue={storeFilter.filter}
-      >
-        <option value="today">TODAY</option>
-        <option value="thisweek">THIS WEEK</option>
-        <option value="nextweek">NEXT WEEK</option>
-      </select>
-      <hr />
+      <GroupSection>
+        <H1>Example 2.2</H1>
+        <Text>Room ID</Text>
+        <Selection
+          onChange={(e: any) => changeRoomId(e.target.value)}
+          value={storeFilter.roomId}
+        >
+          <option value="A101">A101</option>
+          <option value="A102">A102</option>
+          <option value="Auditorium">Auditorium</option>
+        </Selection>
+        <Text>Filter</Text>
+        <Selection
+          onChange={(e: any) => changeRoomFilter(e.target.value)}
+          value={storeFilter.filter}
+        >
+          <option value="today">TODAY</option>
+          <option value="thisweek">THIS WEEK</option>
+          <option value="nextweek">NEXT WEEK</option>
+        </Selection>
+      </GroupSection>
+      <hr style={{ marginTop: "3rem" }} />
       <H1>Example 3</H1>
       <ShowExample3 />
     </div>
