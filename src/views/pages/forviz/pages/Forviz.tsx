@@ -3,7 +3,6 @@ import styled from "styled-components";
 import Example1 from "../components/Example1";
 import Example2 from "../components/Example2";
 import Example3 from "../components/Example3";
-import ShowExample3 from "../components/ShowExample3";
 
 const Container = styled.div`
   width: 100%;

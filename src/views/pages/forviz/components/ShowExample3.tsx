@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
 import moment from "moment";
 import demoBookingData from "../../../../mocks/demoBookingData.json";
+import { convertDateToTimeStartAndEnd } from "../../../../applications/helpers/convertData/convertDate";
+
+import { useSelector, useDispatch } from "react-redux";
+import {
+  CHANGE_DATE_FILTER_HAS_PAYLOAD_REQ,
+  CHANGE_ROOMID_FILTER_HAS_PAYLOAD_REQ,
+} from "../../../../applications/helpers/redux/types/filterDateTime/filterDateTime";
 
 const Container = styled.div`
   position: relative;
@@ -135,6 +142,7 @@ const LineVertical = styled.div`
   left: 5rem;
   z-index: 10;
 `;
+const colorCicle = ["#3DC7D2", "#23CF5F", "#F3814A"];
 const SectionTextData = styled.div<{
   top?: string;
   optical?: boolean;
@@ -173,32 +181,74 @@ const GroupMenuBtn = styled.div`
   position: relative;
 `;
 export default function ShowExample3(props: any) {
-  const { roomId, filter } = props;
+  const storeFilter = useSelector(({ StoreFilter }: any) => StoreFilter);
+  const dispatch = useDispatch();
+  const roomId = storeFilter.roomId;
+  const filter = storeFilter.filter;
   const [roomData, setRoomData] = useState<any>();
-  const [filterDate, setFilterDate] = useState(filter);
-  console.log("roomId :>> ", roomId);
-
+  // const filterDate = filter;
+  const [todayData, setTodayData] = useState<any>();
   const date = moment();
   const dayOfWeek = date.format("dddd");
   const dayMonth = date.format("DD MMM");
-  // const testAddWeek = date.add(1, "week");
+  const getNextweekOfYear = date.add(1, "weeks").weeks();
   const getweekOfYear = date.weeks();
   const getYear = date.year();
-  // console.log("getweekOfYear :>> ", getweekOfYear);
-  // console.log("getYear :>> ", getYear);
+  const getDayOfYear = date.dayOfYear();
 
   useEffect(() => {
-    setFilterDate(filter);
-    const dataSet = demoBookingData.filter((item) => {
-      // return (
-      //   item.roomId === roomId &&
-      //   moment(item.startTime).weeks() === 39 &&
-      //   moment(item.startTime).year() === 2019
-      // );
-      return item.roomId === roomId;
+    // setFilterDate(filter);
+    console.log("refesh :>> ");
+    const dataSet = demoBookingData
+      .filter((item) => {
+        if (filter === "today") {
+          console.log("if today :>> ", "today");
+          return (
+            item.roomId === roomId &&
+            moment(item.startTime).dayOfYear() === 271 && // <=== getDayOfYear // 271
+            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+          );
+        } else if (filter === "thisweek") {
+          console.log("else if :>> ", "thisweek");
+          return (
+            item.roomId === roomId &&
+            moment(item.startTime).weeks() === 39 && // <=== getweekOfYear // 39 || 40
+            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+          );
+        } else {
+          console.log("else :>> ", "nextweek");
+          return (
+            item.roomId === roomId &&
+            moment(item.startTime).weeks() === 40 && // <=== getweekOfYear // 39 || 40
+            moment(item.startTime).year() === 2019 // <=== getYear // 2019
+          );
+        }
+      })
+      .sort((a, b) => {
+        var c: any = moment(a.startTime);
+        var d: any = moment(b.startTime);
+        return c - d;
+      })
+      .reduce((groups: any, item) => {
+        const date = item.startTime.split(" ")[0];
+        if (!groups[date]) {
+          groups[date] = [];
+        }
+        groups[date].push(item);
+        return groups;
+      }, {});
+    const finalData = Object.keys(dataSet).map((item) => {
+      return {
+        date: item,
+        data: dataSet[item],
+      };
     });
-    setRoomData(dataSet);
-    console.log("roomData :>> ", roomData);
+    console.log("finalData :>> ", finalData);
+    const findDayOfYear = finalData.find((item: any) => {
+      return moment(item.date).dayOfYear() === 271; // <== getDayOfYear // 271
+    });
+    setTodayData(findDayOfYear);
+    setRoomData(finalData);
   }, [roomId, filter]);
 
   const initialDateData = {
@@ -208,7 +258,7 @@ export default function ShowExample3(props: any) {
 
   const [dateData, setDateData] = useState(initialDateData);
   const changeFilterFn = (value: string) => {
-    setFilterDate(value);
+    dispatch({ type: CHANGE_DATE_FILTER_HAS_PAYLOAD_REQ, payload: value });
   };
 
   return (
@@ -229,18 +279,24 @@ export default function ShowExample3(props: any) {
             {dateData.dayMonth}
           </TextContents>
           <GroupTextContentsLeft>
-            <TextContentsLeft>
-              <Text optical={true}>13:00 - 14:00</Text>
-              <Text size={"20px"}>Lunch with Petr</Text>
-            </TextContentsLeft>
-            <TextContentsLeft>
-              <Text optical={true}>15:00 - 16:00</Text>
-              <Text size={"20px"}>Sales Weekly Meeting</Text>
-            </TextContentsLeft>
-            <TextContentsLeft>
-              <Text optical={true}>16:00 - 18:00</Text>
-              <Text size={"20px"}>Anastasia Website Warroom</Text>
-            </TextContentsLeft>
+            {todayData &&
+              todayData.data &&
+              todayData.data.length > 0 &&
+              todayData.data.map((item: any, index: number) => {
+                return (
+                  <div key={index}>
+                    <TextContentsLeft>
+                      <Text optical={true}>
+                        {convertDateToTimeStartAndEnd(
+                          item.startTime,
+                          item.endTime
+                        )}
+                      </Text>
+                      <Text size={"20px"}>{item.title}</Text>
+                    </TextContentsLeft>
+                  </div>
+                );
+              })}
           </GroupTextContentsLeft>
         </MainContent>
         <ContentFooterLeft />
@@ -249,130 +305,77 @@ export default function ShowExample3(props: any) {
         <LayoutHeaderContentRight>
           <GroupMenu>
             <GroupMenuBtn>
-              <MenuHeader onClick={() => changeFilterFn("TODAY")}>
+              <MenuHeader onClick={() => changeFilterFn("today")}>
                 TODAY
               </MenuHeader>
-              {filterDate === "TODAY" && (
-                <MenuLine left={"10px"} size={"45px"} />
-              )}
+              {filter === "today" && <MenuLine left={"10px"} size={"45px"} />}
             </GroupMenuBtn>
             <GroupMenuBtn>
-              <MenuHeader onClick={() => changeFilterFn("THIS WEEK")}>
+              <MenuHeader onClick={() => changeFilterFn("thisweek")}>
                 THIS WEEK
               </MenuHeader>
-              {filterDate === "THIS WEEK" && (
+              {filter === "thisweek" && (
                 <MenuLine left={"10px"} size={"95px"} />
               )}
             </GroupMenuBtn>
             <GroupMenuBtn>
-              <MenuHeader onClick={() => changeFilterFn("NEXT WEEK")}>
+              <MenuHeader onClick={() => changeFilterFn("nextweek")}>
                 NEXT WEEK
               </MenuHeader>
-              {filterDate === "NEXT WEEK" && (
+              {filter === "nextweek" && (
                 <MenuLine left={"10px"} size={"105px"} />
               )}
             </GroupMenuBtn>
           </GroupMenu>
         </LayoutHeaderContentRight>
         <SectionContentScroll>
-          <div>
-            <div>
-              <TabInSectionContent>Today (Mon, 28 Sep)</TabInSectionContent>
-              <LineVertical />
-            </div>
-            <div>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData optical>1 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem" size="20px">
-                  Lunch with Petr
-                </SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData optical>2 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem" size="20px">
-                  Lunch with Petr
-                </SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData className="lastChild">
-                <Circle />
-                <SectionTextData optical>3 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem" size="20px">
-                  Lunch with Petr
-                </SectionTextData>
-              </GroupSectionTextData>
-            </div>
-          </div>
-          {/* <div className="mt-15">
-            <div>
-              <TabInSectionContent>Today (Mon, 28 Sep)</TabInSectionContent>
-              <LineVertical />
-            </div>
-            <div>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>1 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>2 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData className="lastChild">
-                <Circle />
-                <SectionTextData>3 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-            </div>
-          </div>
-          <div className="mt-15">
-            <div>
-              <TabInSectionContent>Today (Mon, 28 Sep)</TabInSectionContent>
-              <LineVertical />
-            </div>
-            <div>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>1 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>2 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData className="lastChild">
-                <Circle />
-                <SectionTextData>3 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-            </div>
-          </div>
-          <div className="mt-15">
-            <div>
-              <TabInSectionContent>Today (Mon, 28 Sep)</TabInSectionContent>
-              <LineVertical />
-            </div>
-            <div>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>1 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData>
-                <Circle />
-                <SectionTextData>2 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-              <GroupSectionTextData className="lastChild">
-                <Circle />
-                <SectionTextData>3 - 14:00</SectionTextData>
-                <SectionTextData top="2.5rem">Lunch with Petr</SectionTextData>
-              </GroupSectionTextData>
-            </div>
-          </div> */}
+          {roomData &&
+            roomData.length > 0 &&
+            roomData.map((item: any, index: number) => {
+              return (
+                <div key={index} className={index > 0 ? "mt-15" : ""}>
+                  <div>
+                    <TabInSectionContent>{item.date}</TabInSectionContent>
+                    <LineVertical />
+                  </div>
+
+                  {item &&
+                    item.data &&
+                    item.data.length > 0 &&
+                    item.data.map((itemData: any, indexData: number) => {
+                      return (
+                        <div key={indexData}>
+                          <GroupSectionTextData
+                            className={
+                              indexData === item.data.length - 1 &&
+                              indexData != 0
+                                ? "lastChild"
+                                : ""
+                            }
+                          >
+                            <Circle
+                              color={
+                                indexData < colorCicle.length
+                                  ? colorCicle[indexData]
+                                  : colorCicle[2]
+                              }
+                            />
+                            <SectionTextData optical>
+                              {convertDateToTimeStartAndEnd(
+                                itemData.startTime,
+                                itemData.endTime
+                              )}
+                            </SectionTextData>
+                            <SectionTextData top="2.5rem" size="20px">
+                              {itemData.title}
+                            </SectionTextData>
+                          </GroupSectionTextData>
+                        </div>
+                      );
+                    })}
+                </div>
+              );
+            })}
         </SectionContentScroll>
       </LayoutContentRight>
     </Container>
